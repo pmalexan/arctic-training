@@ -32,6 +32,26 @@ catch <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.
 head(catch)
 ```
 
+Note: cmd + shift + m gives %<%, the pipe operator.
+Note: for pipe, first argument comes from previous output in pipe.
+
+* First "select" the data that is actually needed: Remove marginal sum and notes column.
+* Then "gather" some columns together: move from wide to long format.  
+Gather columns into a new heading "species" ... each row will have a species property and also another property, catch.  ("Spread" is the opposite.)
+
+```{r}
+
+#Clean up data.
+# catch_cleaned <- catch_df %>% 
+#   select(Region, Year, Chinook, Sockeye, Coho, Pink, Chum) or use - to remove columns.
+catch_long <- catch %>% 
+  select(-All, -notesRegCode) %>% 
+  gather(key = "species", value = "catch", -Year, -Region)
+
+head(catch_long)
+
+```
+
 
 # Split-Apply-Combine
 
