@@ -54,15 +54,18 @@ head(catch_long)
 
 Update column name for catch to reflect the units.
 Also we want to update the values in the catch column so we can change the units.
+Due to an erroneous value due to OCR (optical character recognition) issue, the value "I" was changed to 1 for one entry.
 
 ```{r}
   catch_cleaned <- catch_long %>% 
-    rename(catch_thousands = catch) #%>% 
-    #mutate(catch = catch_thousands * 1000)
+    rename(catch_thousands = catch) %>% 
+    mutate(catch_thousands = ifelse(catch_thousands=="I","1",catch_thousands)) %>% 
+    mutate(catch_thousands = as.integer(catch_thousands)) %>% 
+    mutate(catch = catch_thousands * 1000)
   head(catch_cleaned)
 ```
 
-```{r}
+```{r, eval=F, echo=F }
 #Testing chunk, to fix catch column being a string.
 test_catch <- as.integer(catch_cleaned$catch_thousands)  #Convert strings to integers.
 i <- which(is.na(test_catch)==1) #Find where there are no numbers.
@@ -72,4 +75,70 @@ catch_cleaned[i,]   #,] means everything in that dimension
 
 # Split-Apply-Combine
 
+Calculate the total catch by region.
+
+```{r}
+  catch_total <- catch_cleaned %>% 
+    group_by(Region, Year) %>% 
+    summarize(catch_region = sum(catch),
+              n_obs=n())
+  catch_total
+  
+```
+
+Applying a filter to our data to calculate the statistics only for Chinook Salmon.
+Also sort according to a specified value, e.g. Year
+
+```{r}
+  catch_chinook <- catch_cleaned %>% 
+    filter(species == "Chinook" & Year > 1990 & Region == "SSE") %>% 
+    arrange(-Year)
+  head(catch_chinook)
+```
+
+Summary of useful functions for manipulating data:
+
+*select
+*filter
+*mutate
+*rename
+*gather
+*spread
+*arrange
+
 # Joins
+
+Here we will use a "left join" to join the region definitions dataframe to the catch dataframe.
+The key that joins these tables together is the region.
+
+First we'll load the region dataframe.
+
+```{r}
+region_defs <- read.csv(url("https://knb.ecoinformatics.org/knb/d1/mn/v2/object/df35b.303.1", method = "libcurl"),
+                        stringsAsFactors = FALSE)
+head(region_defs)
+
+```
+
+Then we'll clean up the data frame using the "select" function.
+
+```{r}
+  region_clean <- region_defs %>% 
+    select(code, mgmtArea) %>% 
+    rename(Region = code)
+```
+
+Then we'll join the catch and region datasets with a left join.
+
+```{r}
+  # catch_joined <- left_join(catch_cleaned, region_clean, 
+  #                           by = c("Region" = "code"))  #use by if the fields are different.
+  catch_joined <- left_join(catch_cleaned, region_clean)
+  head(catch_joined)
+```
+
+
+
+
+
+
