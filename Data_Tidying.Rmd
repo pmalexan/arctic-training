@@ -52,6 +52,23 @@ head(catch_long)
 
 ```
 
+Update column name for catch to reflect the units.
+Also we want to update the values in the catch column so we can change the units.
+
+```{r}
+  catch_cleaned <- catch_long %>% 
+    rename(catch_thousands = catch) #%>% 
+    #mutate(catch = catch_thousands * 1000)
+  head(catch_cleaned)
+```
+
+```{r}
+#Testing chunk, to fix catch column being a string.
+test_catch <- as.integer(catch_cleaned$catch_thousands)  #Convert strings to integers.
+i <- which(is.na(test_catch)==1) #Find where there are no numbers.
+catch_cleaned[i,]   #,] means everything in that dimension
+```
+
 
 # Split-Apply-Combine
 
