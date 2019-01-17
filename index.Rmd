@@ -99,9 +99,14 @@ Plot timeseries of escapement by species for all regions.
 
   p  #Print the object p.
 
-  ggsave("reigon_escapement.png", plot=p, height=15, width=10, units="in")
+  ggsave("images/region_escapement.png", plot=p, height=15, width=10, units="in")
   
   #Grid.arrage another option.
+```
+
+```{r}
+  write.csv(annual_esc,"derived_data/annual_escapement.csv",
+            row.names=F)
 ```
 
 
