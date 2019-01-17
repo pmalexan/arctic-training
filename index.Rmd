@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r, warning=F, message=F, echo=F}
@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
   library(tidyr)
   library(ggplot2)
   library(DT)
+  library(leaflet)
 ```
 
 
@@ -110,6 +111,26 @@ Plot timeseries of escapement by species for all regions.
 ```
 
 
-#Interactive Match
+#Interactive Map
 
+Create an interactive map using leaflet.
+
+* find unique locations with lat/lon values.
+
+```{r}
+  locations = esc %>% 
+    #produce table with distinct combinations of location, latitude and longitude.
+    distinct(Location, Latitude, Longitude) %>%  
+    drop_na()  #Drop any row that contains a missing value in any part of the row.
+  datatable(locations)
+```
+
+Create the interactive map.
+
+```{r}
+  leaflet(locations) %>% 
+    addTiles() %>%  #adds the background map 
+    addMarkers(~Longitude, ~Latitude, popup = ~ Location)
+  #see example on the tutorial for another detailed example.
+```
 
