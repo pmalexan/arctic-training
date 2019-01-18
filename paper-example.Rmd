@@ -1,0 +1,24 @@
+---
+title: "Reproducible Papers with RMarkdown"
+author: 
+  - "Patrick Alexander, pma2107@ldeo.columbia.edu"
+  - "Bryce Mecum, mecum@nceas.ucsb.edu"
+date: "1/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Abstract
+
+# Introduction
+
+# Methods
+
+# Results
+
+# Discussion
+
+# References
