@@ -1,0 +1,101 @@
+---
+title: "Netcdf testing"
+author: "Patrick"
+date: "1/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message =F, warning =F}
+  library(ncdf4)
+  library(dplyr)
+  library(tidyr)
+  library(ggplot2)
+```
+
+#Read in data from a file.
+
+Open the netcdf file.
+
+```{r}
+  nc <- nc_open("data/WG2013CTD.nc")
+```
+
+Print the netcdf file object.
+
+```{r}
+  print(nc)
+```
+
+Get the names of all the variables and print out.
+
+```{r}
+  vars <- attributes(nc$var)$names
+  vars
+```
+
+Extract some data from the file.
+
+Get the dimension names of the variable.
+```{r}
+  dims <- attributes(nc$dim)$names  
+```
+
+Get the salinity, depth and time variables.
+```{r}
+  salinity <- ncvar_get(nc, "sal") #get the salinity data.
+  depth <- ncvar_get(nc, "z") #depth
+  time_mat <- ncvar_get(nc, "time") #time
+```
+
+# Reformat the output.
+
+Convert the matlab datetime numbers into format readable by R.
+```{r}
+  time <- as.POSIXct((time_mat + 719529)*86400, origin = "1970-01-01", tz = "UTC")
+```
+
+Coerce into a data frame.
+```{r}
+  salinity_data <- as.data.frame(salinity)
+```
+
+Assign column names to depth values.
+```{r}
+  names(salinity_data) <- as.character(depth)
+```
+
+Reshape the data and add time.
+```{r}
+  salinity_data_long <- salinity_data %>% 
+    mutate(time = time) %>% 
+    gather(key = "depth", value = "salinity", -time) %>% 
+    mutate(depth = as.numeric(depth)) %>% 
+    arrange(time)
+  head(salinity_data_long)
+```
+
+#Plots 
+Raster plot, option 1.
+```{r}
+  ggplot(salinity_data_long, mapping = aes(x=time, y=depth, fill = salinity)) +
+    geom_raster()
+```
+
+Raster plot, option 2.
+```{r}
+  ggplot(salinity_data_long, mapping = aes(x=salinity, 
+                                           y=depth,
+                                           color=time,
+                                           group = time)) + #lines are grouped by time, not connected.
+    geom_line(size=0.1) + 
+    scale_y_reverse()
+```
+
+
+
+
+
