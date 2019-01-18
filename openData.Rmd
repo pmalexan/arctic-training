@@ -1,0 +1,75 @@
+---
+title: "ROpenSci Demo"
+author: "Patrick"
+date: "1/18/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Open packages.
+# insall rnoaa buoy package.
+
+```{r}
+
+  #NOAA Buoy
+  # install.packages("rnoaa")
+  # install.packages("ncdf4")
+  
+  library(rnoaa)
+  library(ncdf4)
+  library(ggplot2)
+```
+
+Read in buoy data.
+
+```{r}
+  bd <- buoy(dataset = "cwind", buoyid = 46080, year=2018, datatype = "c")
+  #class(bd) < a buoy object.
+```
+
+Create a windspeed object.
+
+```{r}
+  wind_speed <- data.frame(time = strptime(bd$data$time, format = "%Y-%m-%dT%TZ"), speed = bd$data$wind_spd,
+                           stringsAsFactors = F)
+```
+
+Make a plot of the data.
+
+```{r}
+  ggplot(wind_speed, aes(x=time, y = speed)) +
+    geom_point()
+```
+
+# Install mapping for species occurence.
+
+```{r}
+  # install.packages("mapr",dependencies = TRUE)
+  library(mapr)
+  library(spocc)
+```
+
+Plot location of GBIF species occurence data for grizzly and polar bears.
+
+Load the data.
+```{r}
+  spp <- c("Ursus arctos", "Ursus maritimus", "Ursus americanus kermodei")
+  bears <- occ(query = spp, 
+               from = "gbif",
+               has_coords = T,
+               limit = 500)
+  
+```
+
+Map the data.
+```{r}
+  map_leaflet(bears, color = c("black","orange","pink"), size=1, alpha=1)
+```
+
+Extract sprit bear data.
+```{r}
+  spirit_bears <- bears$gbif$data$Ursus_americanus_kermodei
+```
+
