@@ -1,25 +1,20 @@
 ---
 title: "Reproducible Papers with RMarkdown"
-author: 
-  - "Patrick Alexander, pma2107@ldeo.columbia.edu"
-  - "Bryce Mecum, mecum@nceas.ucsb.edu"
-date: "`r Sys.Date()`"
+author: ["Bryce Mecum, mecum@nceas.ucsb.edu", "Matt Jones, jones@nceas.ucsb.edu"]
 output:
-  word_document: default
   html_document:
     fig_caption: yes
   pdf_document:
     fig_caption: yes
+  word_document: default
 bibliography: references.bib
-#csl: biomed-central.csl  add csl reference.
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, echo=FALSE, message=FALSE, results='hide'}
+# Set up stuff for later
+knitr::opts_chunk$set(fig.path = 'figures/', echo = FALSE, warning = FALSE, message = FALSE)
 
 # Packages we need later on
-  # install.packages("broom")
-  # install.packages("knitr")
   library(ggplot2)
   library(knitr)
   library(broom)
@@ -27,13 +22,14 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
-```{r loaddata, echo=FALSE, message = FALSE, results='hide'}
-  data(diamonds)
-  head(diamonds)
+```{r dataloading, echo=FALSE, message=FALSE, results='hide'}
+# Data we need later on
+data(diamonds)
+head(diamonds)
 ```
 
 ```{r figcaps, echo=FALSE, message=FALSE, results='hide'}
-# Figure and table caption setup... set them up first so we can number them afterwards.
+# Figure and table caption setup
 tbl_caps <- captioner(prefix = "Table")
 tbl_caps("themodel", "This is a broomed linear model summary table.")
 cap_themodel <- tbl_caps("themodel")
@@ -42,7 +38,6 @@ fig_caps <- captioner(prefix = "Figure")
 fig_caps("pricevscarat", "The relationship between price and carat for the diamonds dataset.")
 cap_pricevscarat <- fig_caps("pricevscarat")
 ```
-
 
 # Abstract
 
@@ -79,6 +74,7 @@ The rest of this document will show how we get some of the features we need such
 - Bibliographies
 
 # Methods
+
 Our analysis will be pretty simple.
 We'll use the `diamonds` dataset from the `ggplot2` [@ggplot] package and run a simple linear model.
 At the top of this document, we started with a code chunk with `echo=FALSE` set as a chunk option so that we can load the `ggplot2` package and `diamonds` dataset without outputting anything to the screen.
@@ -116,24 +112,32 @@ And then we just place that in our `.bibtex` file.
 
 # Results
 
-```{r pricevscarat echo=FALSE, fig.cap=cap_pricevscarat, fig.width=8, fig.height=4, fig.align='center', cache=TRUE}
-#fix this caption...
-  ggplot(diamonds, aes(x=carat, y=price, color= clarity)) +
-    geom_point() + 
-    labs(x= "Carats", y= "Price")
+The plot we made was really great (Figure 1).
+
+```{r pricevscarat, echo=FALSE, fig.cap=cap_pricevscarat, fig.width=8, fig.height=4, fig.align='center', cache=TRUE}
+ggplot(diamonds, aes(carat, price, color = clarity)) + 
+  geom_point() +
+  labs(x = "Carat", y = "Price")
 ```
 
-And we can create a table as well if we want to show a model output.
+But the model was even better:
 
 ```{r themodel, echo=FALSE}
 mod <- lm(price ~ carat, diamonds)
 kable(tidy(mod), digits = 2, caption = cap_themodel)
 ```
 
-We were delighted to find that the slpe parameter was `r round(mod$coefficients["carat"][[1]], 2)`
+We were delighted to find that the slope parameter was `r round(mod$coefficients["carat"][[1]], 2)`.
 
 # Discussion
 
-Some really great points were made.
+This was just a quick demonstration of a reproducible paper that combined text, analysis, figures, tables, and citations into multiple output formats (HTML, PDF).
+Hopefully you found it useful.
+
+A lot of people are using RMarkdown these days so there are tons of resources online but here are a few choice ones specifically about making papers:
+
+- [http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html](http://rmarkdown.rstudio.com/authoring_bibliographies_and_citations.html)
+- [http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/](http://svmiller.com/blog/2016/02/svm-r-markdown-manuscript/)
+- [http://www.petrkeil.com/?p=2401](http://www.petrkeil.com/?p=2401)
 
 # References
